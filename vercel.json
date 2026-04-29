@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/api/video/:path*", "destination": "/api/video.js" },
+    { "source": "/api/streams/:id", "destination": "/api/streams.js" },
+    { "source": "/proxy/m3u8", "destination": "/api/proxy.js" }
+  ]
+}
