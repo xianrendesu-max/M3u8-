@@ -145,7 +145,14 @@ router.get('/v2/:videoId', ipRateLimit, async (req, res) => {
 
   try {
     const info = await ytdl.getInfo(`https://www.youtube.com/watch?v=${videoId}`, {
-      requestOptions: { headers: { 'User-Agent': 'Mozilla/5.0...', 'Accept-Language': 'ja-JP,ja;q=0.9' } }
+      // Vercel(EROFS)対策
+      lang: 'ja',
+      requestOptions: {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+          'Accept-Language': 'ja-JP,ja;q=0.9',
+        }
+      }
     });
     const result = {};
     const muxed360p = info.formats.find((f) => f.hasVideo && f.hasAudio && f.height === 360);
@@ -157,7 +164,10 @@ router.get('/v2/:videoId', ipRateLimit, async (req, res) => {
       if (video && japaneseAudio) result[`${height}p`] = { video: { url: video.url }, audio: { url: japaneseAudio.url } };
     }
     res.json(result);
-  } catch (err) { res.status(500).json({ error: 'Failed to fetch' }); }
+  } catch (err) {
+    console.error("❌ v2 error:", err);
+    res.status(500).json({ error: 'Failed to fetch' });
+  }
 });
 
 app.use("/api/video", router);
